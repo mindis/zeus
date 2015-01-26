@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.zeus.event.EventProducer;
 import com.zeus.event.KafkaEventProducer;
+import com.zeus.persistence.DataStore;
 import com.zeus.persistence.MongoDataStore;
 
 @Controller
@@ -23,10 +25,13 @@ public class BaseController {
 
 	private static final String KAFKA_PORT = "2181";
 	private static final String KAFKA_HOST = "127.0.0.1";
+	private static final String MONGO_HOST = "localhost";
+	private static final int MONGO_PORT = 27017;
 	private static final String VIEW_INDEX = "index";
 	private static final String VIEW_DASHBOARD = "dashboard";
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(BaseController.class);
-
+	private final static EventProducer eventProducer = KafkaEventProducer.getConnection(KAFKA_HOST, KAFKA_PORT);
+	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index(ModelMap model) {
 		return VIEW_INDEX;
@@ -44,7 +49,6 @@ public class BaseController {
 			return "Error";
 		}
 
-		KafkaEventProducer eventProducer = KafkaEventProducer.getConnection(KAFKA_HOST, KAFKA_PORT);
 		eventProducer.send("event-counts", jsonData);
 
 		return "success";
@@ -57,9 +61,9 @@ public class BaseController {
 			@RequestParam(required = false, value = "value") Integer value,
 			ModelMap model) {
 
-		MongoDataStore mongo = null;
+		DataStore mongo = null;
 		try {
-			mongo = MongoDataStore.getInstance();
+			mongo = MongoDataStore.getInstance(MONGO_HOST,MONGO_PORT );
 		} catch (UnknownHostException e) {
 			logger.error("Error in connection to mongoDb" + e.getStackTrace());
 			model.addAttribute("message", "Invalid request");

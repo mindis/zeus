@@ -14,7 +14,7 @@ public class TestBaseController {
 	    HttpClient httpClient = new DefaultHttpClient();
 
 	    try {
-	        HttpPost request = new HttpPost("http://127.0.0.1:8080/zeus/data/");
+	        HttpPost request = new HttpPost("http://127.0.0.1:8080/zeus/ingest/");
 	        StringEntity params =new StringEntity("{ \"name\" : \"Event Name\", \"timeInMs\" : \"1422179845\" }");
 	        request.addHeader("content-type", "application/javascript");
 	        request.setEntity(params);

@@ -14,35 +14,36 @@ import kafka.javaapi.consumer.ConsumerConnector;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.zeus.persistence.DataStore;
 import com.zeus.persistence.MongoDataStore;
 
-public class KafkaEventConsumer {
+public class KafkaEventConsumer implements EventConsumer{
 	final static String clientId = "ZeusKafkaClient";
 	final static String TOPIC = "event-counts";
-	ConsumerConnector consumerConnector;
+	private static final String MONGO_HOST = "localhost";
+	private static final int MONGO_PORT = 27017;
+	private ConsumerConnector consumerConnector;
 
 	public KafkaEventConsumer() {
 		Properties properties = new Properties();
 		properties.put("zookeeper.connect", "localhost:2181");
 		properties.put("group.id", "test-group");
 		ConsumerConfig consumerConfig = new ConsumerConfig(properties);
-		consumerConnector = Consumer
-				.createJavaConsumerConnector(consumerConfig);
+		consumerConnector = Consumer.createJavaConsumerConnector(consumerConfig);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void run() {
-		MongoDataStore store = null;
+		DataStore store = null;
 		try {
-			store = MongoDataStore.getInstance();
+			store = MongoDataStore.getInstance(MONGO_HOST, MONGO_PORT);
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
 
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
 		topicCountMap.put(TOPIC, new Integer(1));
-		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumerConnector
-				.createMessageStreams(topicCountMap);
+		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumerConnector.createMessageStreams(topicCountMap);
 		KafkaStream<byte[], byte[]> stream = consumerMap.get(TOPIC).get(0);
 		ConsumerIterator<byte[], byte[]> it = stream.iterator();
 		while (it.hasNext()) {
@@ -52,8 +53,7 @@ public class KafkaEventConsumer {
 
 				HashMap<String, Object> result = new ObjectMapper().readValue(
 						data, HashMap.class);
-				long timeStamp = Long
-						.parseLong((String) result.get("timeInMs"));
+				long timeStamp = Long.parseLong((String) result.get("timeInMs"));
 				String eventName = (String) result.get("name");
 				store.increment(eventName, timeStamp);
 			} catch (Exception e) {

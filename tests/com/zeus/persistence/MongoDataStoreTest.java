@@ -5,15 +5,15 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import com.zeus.persistence.MongoDataStore;
-
 public class MongoDataStoreTest {
-
+	String mongoHost = "localhost";
+	int mongoPort = 27017;
+	
 	@Test
 	public void testIncrementHourlyCounter() {
-		MongoDataStore store = null;
+		DataStore store = null;
 		try {
-			store = MongoDataStore.getInstance();
+			store = MongoDataStore.getInstance(mongoHost, mongoPort);
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
@@ -22,9 +22,9 @@ public class MongoDataStoreTest {
 	
 	@Test
 	public void testGetData(){
-		MongoDataStore store = null;
+		DataStore store = null;
 		try {
-			store = MongoDataStore.getInstance();
+			store = MongoDataStore.getInstance(mongoHost, mongoPort);
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}

@@ -11,13 +11,13 @@ import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
 
-public class KafkaEventProducer{
+public class KafkaEventProducer implements EventProducer{
 	private static KafkaEventProducer kafkaProducer = null;
 	private static Producer<String, String> internalProducer; 
 	private KafkaEventProducer(){}
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(BaseController.class);
 	
-	public static KafkaEventProducer getConnection(String host, String port) {
+	public static EventProducer getConnection(String host, String port) {
 		synchronized (KafkaEventProducer.class) {
 			if(kafkaProducer == null){
 				Properties props = new Properties();

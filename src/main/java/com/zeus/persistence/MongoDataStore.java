@@ -12,23 +12,20 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
-public class MongoDataStore {
-	private static final String MONGO_HOST = "localhost";
-	private static final int MONGO_PORT = 27017;
-	private static MongoDataStore mongoDataStore;
+public class MongoDataStore implements DataStore{
+	private static DataStore mongoDataStore;
 	private static DBCollection dailyMetricsColl;
 	private static DBCollection rawEventsColl;
 
 	private MongoDataStore() {
 	};
 
-	public static MongoDataStore getInstance() throws UnknownHostException {
+	public static DataStore getInstance(String mongoHost, int mongoPort) throws UnknownHostException {
 		synchronized (MongoDataStore.class) {
 			if(mongoDataStore == null){
-				MongoClient mongoClient = new MongoClient(MONGO_HOST, MONGO_PORT);
+				MongoClient mongoClient = new MongoClient(mongoHost, mongoPort);
 				DB db = mongoClient.getDB("zeus");
 				dailyMetricsColl = db.getCollection("daily_metrics");
 				rawEventsColl = db.getCollection("raw_events");
@@ -56,9 +53,13 @@ public class MongoDataStore {
 		return count;
 	}
 	
-	public WriteResult storeRawEvent(String jsonData){
+	public boolean storeRawEvent(String jsonData){
 		DBObject rawEvent = (DBObject) JSON.parse(jsonData);
-		return rawEventsColl.insert(rawEvent);
+		boolean success = false;
+		if(rawEventsColl.insert(rawEvent) != null){
+			success = true;
+		}
+		return success;
 	}
 	
 	public int getHourlyCount(String eventName, Date date, Integer hour){
