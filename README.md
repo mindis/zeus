@@ -1,6 +1,6 @@
 #Overview
 zeus is a simple event processing system which takes events via a HTTP endpoint (ingest) and pushes it to a kafka queue. A kafka consumer polls data from the other end of the queue and builds metrics collection in mongodb. This implementation will run on a single machine but nothing stops the user from deploying it in a distributed environment, the kafka broker will take care of message distribution for multiple kafka consumers.
-The metrics can be viewed from a "dashboard". The API and dashboard are built using a sigle Spring 4.x controller, ideally in production the ingest API and dashboard should run on separate processes for high availability.
+The metrics can be viewed from a "dashboard". The API and dashboard are built using Spring 4.x controller, ideally in production the ingest API and dashboard should run on separate processes for high availability.
 
 
 #Setup
