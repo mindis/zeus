@@ -1,15 +1,24 @@
 #Overview
+At a high level the project has 3 parts:
+
+1. An "ingest" API which accepts JSON via HTTP POST and pushed it to kafka queue. Completely async and really fast.
+
+2. A kafka consumer (a separate process) which starts polling the data from the other end of the queue and constructs daily metrics in mongodb.
+
+3. A dashboard which reads directly from mongodb and show metrics.
+
+
 zeus is a simple event processing system which takes events via a HTTP endpoint (ingest) and pushes it to a kafka queue. A kafka consumer polls data from the other end of the queue and builds metrics collection in mongodb. This implementation will run on a single machine but nothing stops the user from deploying it in a distributed environment, the kafka broker will take care of message distribution for multiple kafka consumers.
 The metrics can be viewed from a "dashboard". The API and dashboard are built using Spring 4.x controller, ideally in production the ingest API and dashboard should run on separate processes for high availability.
 
 
 #Setup
-0. Install mongodb and run on default settings (can use brew, macports for mac)
+1. Install mongodb and run on default settings (can use brew, macports for mac)
 
-1. `./bin/grid bootstrap`  
+2. `./bin/grid bootstrap`  
 This will setup kafka and zookeeper locally in `deploy` directory. grid is inspired from samza's bootstrap script.
 
-2. Create kafka topic:  
+3. Create kafka topic:  
 `./deploy/kafka/bin/kafka-topics.sh --create --topic event-counts --replication-factor 1 --zookeeper 127.0.0.1:2181 --partition 1`  
 Now, we are keeping things simple here, in production env, we would have a replication factor of atleast 3 and a higher partion value
 
