@@ -1,11 +1,11 @@
 #Overview
 At a high level the project has 3 parts:
 
-1. An "ingest" API which accepts JSON via HTTP POST and pushed it to kafka queue. Completely async and really fast.
+1. An "ingest" API which accepts JSON via HTTP POST and pushes it to kafka queue. Completely async and really fast.
 
 2. A kafka consumer (a separate process) which starts polling the data from the other end of the queue and constructs daily metrics in mongodb.
 
-3. A dashboard which reads directly from mongodb and show metrics.
+3. A dashboard which reads directly from mongodb and shows metrics.
 
 
 zeus is a simple event processing system which takes events via a HTTP endpoint (ingest) and pushes it to a kafka queue. A kafka consumer polls data from the other end of the queue and builds metrics collection in mongodb. This implementation will run on a single machine but nothing stops the user from deploying it in a distributed environment, the kafka broker will take care of message distribution for multiple kafka consumers.
